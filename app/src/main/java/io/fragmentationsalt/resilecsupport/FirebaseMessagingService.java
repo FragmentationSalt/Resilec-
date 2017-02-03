@@ -8,9 +8,8 @@ import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-/**
- * Created by rohan on 2/1/2017.
- */
+//Created by rohan on 2/1/2017.
+
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     @Override
@@ -19,7 +18,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         shownotification(remoteMessage.getData().get("message"));
         Log.d("Msg", "Message received ["+remoteMessage+"]");
     }
-
     void shownotification(String message)
     {
         Intent i = new Intent(this,MainActivity.class);
@@ -37,5 +35,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         manager.notify(0,builder.build());
+
+        GPSAsync gp = new GPSAsync();
+        gp.execute((Void) null);
     }
 }

@@ -1,31 +1,32 @@
 package io.fragmentationsalt.resilecsupport;
 
 import android.Manifest;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
 import android.test.mock.MockPackageManager;
-import android.widget.Toast;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
-import com.google.firebase.messaging.RemoteMessage;
 
 public class MainActivity extends AppCompatActivity{
     private static final int REQUEST_CODE_PERMISSION = 2;
     String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     // GPSTracker class
     GPSTracker gps;
-
-    double latitude;
     double longitude;
+    double latitude;
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    private static Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startService(new Intent(getApplicationContext(),FirebaseInstanceIDService.class));
+        FirebaseMessaging.getInstance().subscribeToTopic("test");
+        FirebaseInstanceId.getInstance().getToken();
+        MainActivity.context = getApplicationContext();
            try {
             if (ActivityCompat.checkSelfPermission(this, mPermission)
                     != MockPackageManager.PERMISSION_GRANTED) {
@@ -44,9 +45,12 @@ public class MainActivity extends AppCompatActivity{
                 latitude = gps.getLatitude();
                 longitude = gps.getLongitude();
 
+                SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES,MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putString("long",String.valueOf(longitude));
+                editor.putString("lat",String.valueOf(latitude));
+                editor.apply();
                 // \n is for new line
-                Toast.makeText(getApplicationContext(), "Your Location is - \nLat: "
-                        + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
             }else{
                 // can't get location
                 // GPS or Network is not enabled
@@ -56,6 +60,11 @@ public class MainActivity extends AppCompatActivity{
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Context getContext()
+    {
+        return MainActivity.context;
     }
 
 
